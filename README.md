@@ -1,70 +1,47 @@
-# Getting Started with Create React App
+## React-based Spotify Playlist Maker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was created to gain experience with React as part of the Codecademy course [Create a Front-End App with React](https://www.codecademy.com/learn/paths/build-web-apps-with-react).
 
-## Available Scripts
+Additional features implemented for the project beyond the Codecademy course specification:
+* Additional feature 1
+* Addiotional Feature 2
 
-In the project directory, you can run:
+## Tech Stack
+*   **Frontend:** React (Hooks, Functional Components), HTML5, CSS3 (CSS Modules)
+*   **JavaScript:** ES6+
+*   **API Integration:** Yelp Fusion API (via a proxy for local development)
+*   **Development Tools:** VS Code with Gemini Code Assist, Git, npm
 
-### `npm start`
+## Key Learnings & Skills Demonstrated
+*   **React Development:** Building a single-page application with functional components, state management using Hooks (`useState`, `useEffect`), and prop drilling.
+*   **API Consumption:** Asynchronously fetching and displaying data from a third-party API, including handling loading and error states.
+*   **Component-Based Architecture:** Designing reusable and modular UI components following stateless/stateful patterns.
+*   **Modern JavaScript:** Utilizing ES6+ features for cleaner and more efficient code.
+*   **AI:** Leveraging AI for code assistance.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Demo version of the project
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+A demo version of the project can be found here: [Ravenous by Hammelev](https://hammelev.github.io/ravenous/)
 
-### `npm test`
+## Running the application
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To run the application locally:
 
-### `npm run build`
+1.  **Ensure Node.js is installed:** This includes npm (Node Package Manager).
+2.  **Clone the repository:**
+    ```bash
+    git clone <insert git repo url>
+    cd jammming
+    ```
+3.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+4.  **Configure Spotify API Key**
+5.  **Start the development server:**
+    ```bash
+    npm start
+    ```
+    This will open the application in your default web browser at `http://localhost:3000`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
