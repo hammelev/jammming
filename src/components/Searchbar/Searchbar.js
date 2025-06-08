@@ -1,12 +1,23 @@
-// TODO: Add a form for the user to input search text and submit search
-// TODO: Add styling for Playlist
+// Styles
+import styles from './searchbar.module.css';
 
-export default function Searchbar() {
+// TODO: Pretify search bar
+
+export default function Searchbar({searchQuery, onSetSearchQuery, onHandleSearch}) {
+
+    const handleSearchChange = (event) => {
+        onSetSearchQuery(event.target.value);
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        onHandleSearch();
+    }
     
-
     return (
-        <div>
-            <p>Searchbar</p>
-        </div>
+        <form className={styles["search-bar"]} onSubmit={handleSubmit}>
+            <input type="text" onChange={handleSearchChange} value={searchQuery} />
+            <button type="submit">Search</button>
+        </form>
     );
 }

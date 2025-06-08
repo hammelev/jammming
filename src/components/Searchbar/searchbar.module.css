@@ -1,0 +1,9 @@
+.search-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: blueviolet;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+}

@@ -1,11 +1,15 @@
 // Components
 import Tracklist from '../Tracklist/Tracklist';
 
-// TODO: Add styling for SearchResults
+// Styles
+import styles from './searchResults.module.css';
+
+
+// TODO: Pretify Search Results
 
 export default function SearchResults({tracks}){
     return (
-        <div>
+        <div className={styles['search-results-container']}>
             <p>Search Results</p>
             <Tracklist tracks={tracks}/>
         </div>
