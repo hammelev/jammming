@@ -3,10 +3,10 @@
 // TODO: Add a button to add a track to a playlist
 // TODO: Add a button to remove a track from a "draft" play list => Consider if the two bottons can be implemented as a general "action" where the parent provides an action function as well as an icon to display
 
-export default function Track(){
+export default function Track({track}){
     return (
         <div>
-            <p>Track</p>
+            <p>{track.name}</p>
         </div>
     );
 }

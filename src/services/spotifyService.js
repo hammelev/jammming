@@ -1,17 +1,151 @@
+let accessToken = localStorage.getItem('access_token') || null;
+let accessTokenExpiresAt = localStorage.getItem('access_token_expires_at') ? parseInt(localStorage.getItem('access_token_expires_at'), 10) : null;
+let refreshToken = localStorage.getItem('refresh_token') || null;
 
-// TODO: Implement searching for a track on Spotify
-const searchForTrack = async () => {
-    return "foobar";
+// TODO: Seperate the auth flow into an explicit Auth Flow
+// TODO: Implement refresh of auth token using refresh token
+
+const searchForTrack = async (searchQuery) => {
+    if (!accessToken) {
+        await initiateOAuthFlow();
+    } else {
+		// TODO: Add logic here to check if accessToken is expired using accessTokenExpiresAt.
+		// If expired, attempt to use refreshToken or re-initiate OAuth flow.
+		try {
+			const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/search?q=${searchQuery}&type=track`, {
+				headers: {
+					'Authorization': `Bearer ${accessToken}`,
+				}
+			});
+
+			if (!response.ok) {
+				// TODO: Handle token expiry (e.g., 401 Unauthorized) and attempt refresh if possible.
+				console.error('Error searching for track. Status:', response.status, response.statusText);
+				// Consider initiating OAuth flow again if token is invalid and cannot be refreshed.
+				// await initiateOAuthFlow();
+				return []; // Return empty array or throw error to be handled by caller
+			}
+			const data = await response.json();
+			return data.tracks.items;
+		} catch (error) {
+			console.error('Network error or JSON parsing error during search:', error);
+			return []; // Return empty array or throw error
+		}
+	}
 }
 
 // TODO: Implement creating a playlist on Spotify
 const createPlaylist = async () => {
-    return "foobar";
+    return true;
 }
 
-// TODO: Implement OAuth authentication with Spotify - consider moving the functionality to a seperate file if it gets big.
-const authenticate = async () => {
-    return "foobar";
+const initiateOAuthFlow = async () => {
+	try {
+		const codeVerifier = base64URLEncode(generateRandom(96));
+		const codeChallenge = base64URLEncode(await sha256(codeVerifier));
+
+		// Save to be used when fetching access token
+		localStorage.setItem('code_verifier', codeVerifier);
+
+		const params =  {
+			response_type: 'code',
+			client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
+			scope: process.env.REACT_APP_SPOTIFY_SCOPE,
+			code_challenge_method: 'S256',
+			code_challenge: codeChallenge,
+			redirect_uri: process.env.REACT_APP_SPOTIFY_REDIRECT_URI,
+		}
+
+		const authUrl = new URL(process.env.REACT_APP_SPOTIFY_AUTH_URL);
+		authUrl.search = new URLSearchParams(params).toString();
+
+		// Redirect to Spotify OAuth page
+		window.location.href = authUrl.toString();
+	} catch (error) {
+		console.error("Error during OAuth initiation:", error);
+		// Potentially display an error message to the user or redirect to an error page
+		// For now, just logging, as redirecting here might be tricky if window.location is the goal
+	}
 }
 
-export { searchForTrack, createPlaylist };
+const handleAuthRedirect = async () => {
+	const params = new URLSearchParams(window.location.search);
+	const code = params.get('code');
+	const error = params.get('error');
+
+	if (error) {
+		console.error('Spotify authentication error:', error);
+		return false;
+	}
+
+	const codeVerifier = localStorage.getItem('code_verifier');
+
+	const payload = {
+		method: 'POST',
+		headers: {
+		'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: new URLSearchParams({
+			client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
+			grant_type: 'authorization_code',
+			code,
+			redirect_uri: process.env.REACT_APP_SPOTIFY_REDIRECT_URI,
+			code_verifier: codeVerifier,
+		}),
+	}
+
+	try {
+		const response = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
+
+		if (!response.ok) {
+			console.log(response);
+			console.error('Error fetching access token:', response.statusText);
+			return false;
+		}
+
+		const body = await response.json();
+
+		accessToken = body.access_token;
+		accessTokenExpiresAt = Date.now() + (body.expires_in * 1000); // body.expires_in is typically in seconds
+		refreshToken = body.refresh_token;
+
+		localStorage.setItem('access_token', body.access_token);
+		localStorage.setItem('access_token_expires_at', accessTokenExpiresAt.toString());
+		localStorage.setItem('refresh_token', body.refresh_token); // Only store if present
+		window.history.replaceState({}, document.title, "/");
+
+		localStorage.removeItem('code_verifier');
+		
+		// For now, let's assume it's successful and would return token data
+		console.log(`Successfully got access token: ${body.access_token}`);
+		return true;
+	} catch (error) {
+		console.error('Error fetching access token:', error);
+		return false;
+	}
+}
+
+
+/*
+ * Base64URL maps + -> -, / -> _ and removes padding = as these characters are not safe in URLs
+*/
+const base64URLEncode = (input) => {
+	return btoa(String.fromCharCode(...new Uint8Array(input)))
+		.replace(/=/g, '')
+		.replace(/\+/g, '-')
+		.replace(/\//g, '_');
+}
+
+const generateRandom = (length) => {
+  	return crypto.getRandomValues(new Uint8Array(length));
+}
+
+// The TextEncoder will encode the string with UTF-8.
+// For base 64 characters the encoding is the same in ASCII and UTF-8
+const sha256 = async (plain) => {
+	const encoder = new TextEncoder()
+	const data = encoder.encode(plain)
+	return window.crypto.subtle.digest('SHA-256', data)
+}
+
+export { searchForTrack, createPlaylist, handleAuthRedirect };
