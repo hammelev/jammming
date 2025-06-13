@@ -7,11 +7,14 @@ import styles from './searchResults.module.css';
 
 // TODO: Pretify Search Results
 
-export default function SearchResults({tracks}){
+export default function SearchResults({tracks, onAddToPlaylist}){
     return (
         <div className={styles['search-results-container']}>
-            <p>Search Results</p>
-            <Tracklist tracks={tracks}/>
+            <h2>Search Results</h2>
+            <Tracklist
+                tracks={tracks}
+                action={{handler: onAddToPlaylist, symbol: '+'}}
+            />
         </div>
     );
 }

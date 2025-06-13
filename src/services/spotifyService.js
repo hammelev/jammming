@@ -3,14 +3,16 @@ let accessTokenExpiresAt = localStorage.getItem('access_token_expires_at') ? par
 let refreshToken = localStorage.getItem('refresh_token') || null;
 
 // TODO: Seperate the auth flow into an explicit Auth Flow
-// TODO: Implement refresh of auth token using refresh token
 
 const searchForTrack = async (searchQuery) => {
     if (!accessToken) {
         await initiateOAuthFlow();
     } else {
-		// TODO: Add logic here to check if accessToken is expired using accessTokenExpiresAt.
-		// If expired, attempt to use refreshToken or re-initiate OAuth flow.
+		// Refresh access token if it is expired
+		if (Date.now() > accessTokenExpiresAt) {
+			await refreshAccessToken();
+		}
+
 		try {
 			const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/search?q=${searchQuery}&type=track`, {
 				headers: {
@@ -123,6 +125,40 @@ const handleAuthRedirect = async () => {
 		console.error('Error fetching access token:', error);
 		return false;
 	}
+}
+
+const refreshAccessToken = async () => {
+
+	const payload = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
+      }),
+    }
+
+	try {
+		const body = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
+		const data = await body.json();
+
+		accessToken = data.access_token;
+		accessTokenExpiresAt = Date.now() + (data.expires_in * 1000);
+		if (body.refresh_token) {
+			refreshToken = body.refresh_token;
+			localStorage.setItem('refresh_token', body.refresh_token);
+		}
+
+		localStorage.setItem('access_token', accessToken);
+		localStorage.setItem('access_token_expires_at', accessTokenExpiresAt.toString());
+
+	} catch (error) {
+		console.error('Error refreshing access token:', error);
+	}
+
 }
 
 

@@ -16,7 +16,12 @@ export default function Searchbar({searchQuery, onSetSearchQuery, onHandleSearch
     
     return (
         <form className={styles["search-bar"]} onSubmit={handleSubmit}>
-            <input type="text" onChange={handleSearchChange} value={searchQuery} />
+            <input
+                type="text"
+                onChange={handleSearchChange}
+                value={searchQuery}
+                required
+            />
             <button type="submit">Search</button>
         </form>
     );

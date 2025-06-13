@@ -1,0 +1,32 @@
+.track-container {
+    display: flex;
+    align-items: center; /* Vertically aligns items in the middle */
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+/* Targets the div rendered by the Track component */
+.track-container > div:first-child {
+    flex-grow: 1; /* Allows this element to take up available space */
+    margin-right: 0.5rem; /* Adds a small space between track info and button */
+    overflow: hidden; /* Prevents long text from breaking layout */
+    text-overflow: ellipsis; /* Shows ... for overflowed text */
+    white-space: nowrap; /* Keeps track info on a single line */
+}
+
+.track-container button {
+    flex-shrink: 0; /* Prevents the button from shrinking */
+}
+
+.action-button {
+    border-radius: 10px;
+    border-width: 1px;
+    color: blue;
+    background-color:hotpink;
+    font-weight: bolder;
+}
+
+.action-button:hover {
+    background-color:greenyellow;
+}

@@ -56,6 +56,22 @@ export default function App() {
     }
   }
 
+  const handleAddToPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      if (prev.find(prevTrack => prevTrack.id === track.id)) {
+        return [...prev]
+      }
+      return [...prev, track];
+    });
+  }
+
+  const handleRemoveFromPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      return prev.filter(prevTrack => prevTrack.id !== track.id);
+    });
+  }
+
+
   const handleSavePlayList = () => {
     alert(`Saving playlist: ${playlistName}`);
   }
@@ -74,8 +90,16 @@ export default function App() {
       </header>
       <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} />
       <div className={styles["track-container"]}>
-        <SearchResults tracks={searchResultTracks} />
-        <Playlist tracks={playlistTracks} playlistName={playlistName} onSetPlaylistName={setPlaylistName} onSavePlaylist={handleSavePlayList} />
+        <SearchResults
+          tracks={searchResultTracks}
+          onAddToPlaylist={handleAddToPlaylist} />
+        <Playlist
+          tracks={playlistTracks}
+          playlistName={playlistName}
+          onSetPlaylistName={setPlaylistName}
+          onSavePlaylist={handleSavePlayList}
+          onRemoveFromPlaylist={handleRemoveFromPlaylist}
+        />
       </div>
 
     </div>

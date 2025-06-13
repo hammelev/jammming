@@ -1,3 +1,8 @@
 .playlist-container{
-    background-color: chocolate;
+    background-color: rgba(200, 25, 200, 0.3);
+    min-height: 50vh;
+    width: 40vw;
+    border-radius: 25px;
+    margin: 2vh 0;
+    padding: 0 1vw;
 }
