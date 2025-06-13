@@ -2,15 +2,29 @@ let accessToken = localStorage.getItem('access_token') || null;
 let accessTokenExpiresAt = localStorage.getItem('access_token_expires_at') ? parseInt(localStorage.getItem('access_token_expires_at'), 10) : null;
 let refreshToken = localStorage.getItem('refresh_token') || null;
 
-// TODO: Seperate the auth flow into an explicit Auth Flow
+const getUserInformation = async () => {
+	try {
+		await checkAndRefreshAuthToken();
+		const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/me`, {
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			}
+		});
+
+		const data = await response.json();
+
+		return data;
+		
+	} catch (error) {
+		console.error('Error getting user data:', error);
+	}
+}
 
 const searchForTrack = async (searchQuery) => {
 	// Refresh access token if it is expired
-	if (Date.now() > accessTokenExpiresAt) {
-		await refreshAccessToken();
-	}
-
 	try {
+		await checkAndRefreshAuthToken();
+
 		const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/search?q=${searchQuery}&type=track`, {
 			headers: {
 				'Authorization': `Bearer ${accessToken}`,
@@ -33,9 +47,78 @@ const searchForTrack = async (searchQuery) => {
 
 }
 
-// TODO: Implement creating a playlist on Spotify
-const createPlaylist = async () => {
-    return true;
+const createPlaylist = async (playlistName, tracks) => {
+	try {
+		await checkAndRefreshAuthToken();
+
+		// Get user info
+		const userInformation = await getUserInformation();
+
+		console.log(`=== ${playlistName} ===`);
+
+		// Create playlist
+		const createPlaylistPayload = {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify({
+				name: playlistName,
+				description: "New playlist description",
+				public: false,
+			}),
+		}
+
+		const createPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/users/${userInformation.id}/playlists`, createPlaylistPayload);
+
+		if (!createPlayListResponse.ok) {
+			const playlistData = await createPlayListResponse.json();
+			console.error('Error creating playlist:', createPlayListResponse.statusText);
+			console.log(createPlayListResponse);
+			console.log(playlistData);
+			return;
+		}
+
+		const playlistData = await createPlayListResponse.json();
+
+		// Add tracks
+		const addTracksToPlaylistPayload = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify({
+				uris: tracks.map(track => track.uri),
+			}),
+		}
+
+		const addTracksTpPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/playlists/${playlistData.id}/tracks`, addTracksToPlaylistPayload);
+
+		if (!addTracksTpPlayListResponse.ok) {
+			/*const addTracksTo = await createPlayListResponse.json();
+			console.error('Error creating playlist:', createPlayListResponse.statusText);
+			console.log(createPlayListResponse);
+			console.log(playlistData);*/
+			console.error('Error adding tracks to playlist:', addTracksToPlaylistPayload.statusText);
+			return;
+		}
+
+		console.log('Tracks added to playlist successfully.')
+		
+	} catch (error) {
+		console.error('Error creating playlist:', error);
+	}
+}
+
+
+
+
+const checkAndRefreshAuthToken = async () => {
+	if (Date.now() > accessTokenExpiresAt) {
+		await refreshAccessToken();
+	}
 }
 
 const initiateOAuthFlow = async () => {

@@ -1,10 +1,12 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 
 // Components
 import Playlist from '../Playlist/Playlist';
 import Searchbar from '../Searchbar/Searchbar';
 import SearchResults from '../SearchResults/SearchResults';
 import Login from '../Login/Login';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'; // Import the spinner
+
 
 // Styles
 import styles from './app.module.css';
@@ -14,7 +16,6 @@ import {searchForTrack, createPlaylist} from '../../services/spotifyService';
 
 
 // TODO: Improve styling of the App e.g. header bar with title of the application and bacground.
-// TODO: Call spotifyService to authenticate, search for tracks and create playlist
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,16 +23,21 @@ export default function App() {
   const [playlistName, setPlaylistName] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async () => {
+    setIsLoading(true); // Start loading
+
     try {
       const tracks = await searchForTrack(searchQuery);
-	  if (tracks){
-		setSearchResultTracks(tracks);
-	  }
+      if (tracks){
+        setSearchResultTracks(tracks);
+      }
       
     } catch  (error) {
       console.error("Error searching for tracks:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   }
 
@@ -50,12 +56,20 @@ export default function App() {
     });
   }
 
-  const handleSavePlayList = () => {
-    alert(`Saving playlist: ${playlistName}`);
+  const handleSavePlayList = async () => {
+    setIsLoading(true); // Start loading
+    try {
+      await createPlaylist(playlistName, playlistTracks);
+    } catch (error) {
+      console.error("Error saving playlist:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   }
 
   return (
     <div className={styles.app}>
+      {isLoading && <LoadingSpinner />} {/* Conditionally render the spinner */}
       <header className={styles["app-header"]}>
         <p>
           Jammming
@@ -64,7 +78,7 @@ export default function App() {
       {
         isAuthenticated ?
         <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} /> :
-        <Login handleIsAuthenticated={setIsAuthenticated}/>
+        <Login handleIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading}/>
       }
       
       <div className={styles["track-container"]}>
