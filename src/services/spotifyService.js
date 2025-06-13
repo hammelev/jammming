@@ -5,35 +5,32 @@ let refreshToken = localStorage.getItem('refresh_token') || null;
 // TODO: Seperate the auth flow into an explicit Auth Flow
 
 const searchForTrack = async (searchQuery) => {
-    if (!accessToken) {
-        await initiateOAuthFlow();
-    } else {
-		// Refresh access token if it is expired
-		if (Date.now() > accessTokenExpiresAt) {
-			await refreshAccessToken();
-		}
-
-		try {
-			const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/search?q=${searchQuery}&type=track`, {
-				headers: {
-					'Authorization': `Bearer ${accessToken}`,
-				}
-			});
-
-			if (!response.ok) {
-				// TODO: Handle token expiry (e.g., 401 Unauthorized) and attempt refresh if possible.
-				console.error('Error searching for track. Status:', response.status, response.statusText);
-				// Consider initiating OAuth flow again if token is invalid and cannot be refreshed.
-				// await initiateOAuthFlow();
-				return []; // Return empty array or throw error to be handled by caller
-			}
-			const data = await response.json();
-			return data.tracks.items;
-		} catch (error) {
-			console.error('Network error or JSON parsing error during search:', error);
-			return []; // Return empty array or throw error
-		}
+	// Refresh access token if it is expired
+	if (Date.now() > accessTokenExpiresAt) {
+		await refreshAccessToken();
 	}
+
+	try {
+		const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/search?q=${searchQuery}&type=track`, {
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			}
+		});
+
+		if (!response.ok) {
+			// TODO: Handle token expiry (e.g., 401 Unauthorized) and attempt refresh if possible.
+			console.error('Error searching for track. Status:', response.status, response.statusText);
+			// Consider initiating OAuth flow again if token is invalid and cannot be refreshed.
+			// await initiateOAuthFlow();
+			return []; // Return empty array or throw error to be handled by caller
+		}
+		const data = await response.json();
+		return data.tracks.items;
+	} catch (error) {
+		console.error('Network error or JSON parsing error during search:', error);
+		return []; // Return empty array or throw error
+	}
+
 }
 
 // TODO: Implement creating a playlist on Spotify
@@ -77,7 +74,7 @@ const handleAuthRedirect = async () => {
 
 	if (error) {
 		console.error('Spotify authentication error:', error);
-		return false;
+		throw error;
 	}
 
 	const codeVerifier = localStorage.getItem('code_verifier');
@@ -184,4 +181,4 @@ const sha256 = async (plain) => {
 	return window.crypto.subtle.digest('SHA-256', data)
 }
 
-export { searchForTrack, createPlaylist, handleAuthRedirect };
+export { searchForTrack, createPlaylist, handleAuthRedirect, initiateOAuthFlow };

@@ -4,12 +4,13 @@ import {useEffect, useState} from 'react';
 import Playlist from '../Playlist/Playlist';
 import Searchbar from '../Searchbar/Searchbar';
 import SearchResults from '../SearchResults/SearchResults';
+import Login from '../Login/Login';
 
 // Styles
 import styles from './app.module.css';
 
 // Services
-import {searchForTrack, createPlaylist, handleAuthRedirect} from '../../services/spotifyService';
+import {searchForTrack, createPlaylist} from '../../services/spotifyService';
 
 
 // TODO: Improve styling of the App e.g. header bar with title of the application and bacground.
@@ -20,29 +21,7 @@ export default function App() {
   const [searchResultTracks, setSearchResultTracks] = useState([]);
   const [playlistName, setPlaylistName] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const [isAuthenticating, setIsAuthenticating] = useState(JSON.parse(localStorage.getItem("isAuthenticating")) || false)
-
-  useEffect(() => {
-    const handleAuthCallback = async () => {
-      if (window.location.pathname === '/callback' && JSON.parse(localStorage.getItem("isAuthenticating")) !== true) {
-        try {
-          localStorage.setItem("isAuthenticating", true);
-          setIsAuthenticating(true);
-
-          await handleAuthRedirect();
-
-        } catch (error) {
-          console.error("Error fetching access token:", error);
-
-        } finally {
-          localStorage.setItem("isAuthenticating", false);
-          setIsAuthenticating(false);
-        }
-      }
-    }
-	handleAuthCallback();
-    
-  }, [])
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
 
   const handleSearch = async () => {
     try {
@@ -71,16 +50,10 @@ export default function App() {
     });
   }
 
-
   const handleSavePlayList = () => {
     alert(`Saving playlist: ${playlistName}`);
   }
 
-
-  if (window.location.pathname === '/callback') {
-
-    return <p>I Came back from Spotify</p>
-  }
   return (
     <div className={styles.app}>
       <header className={styles["app-header"]}>
@@ -88,7 +61,12 @@ export default function App() {
           Jammming
         </p>
       </header>
-      <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} />
+      {
+        isAuthenticated ?
+        <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} /> :
+        <Login handleIsAuthenticated={setIsAuthenticated}/>
+      }
+      
       <div className={styles["track-container"]}>
         <SearchResults
           tracks={searchResultTracks}
