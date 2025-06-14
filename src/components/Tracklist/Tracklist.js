@@ -1,9 +1,8 @@
 // Components
 import Track from '../Track/Track';
 
+// Styles
 import styles from './tracklist.module.css';
-
-// TODO: Add styling for Tracklist
 
 export default function TrackList({tracks, action}){
 
@@ -15,7 +14,7 @@ export default function TrackList({tracks, action}){
                         <Track track={track} />
                         <button
                             className={styles['action-button']}
-                            onClick={() => action.handler(track)}>{action?.symbol ? action.symbol : '?'}
+                            onClick={() => action.handler(track)}>{action?.symbol ?? '?'}
                         </button>
                     </div>
                     <hr/>

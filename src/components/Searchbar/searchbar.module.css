@@ -1,9 +1,13 @@
 .search-bar {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    background-color: blueviolet;
     padding-top: 2vh;
     padding-bottom: 2vh;
+}
+
+.search-bar input {
+    margin-right: 0.5vw;
+    font-size: 1em;
 }

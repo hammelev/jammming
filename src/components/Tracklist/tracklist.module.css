@@ -1,8 +1,7 @@
 .track-container {
     display: flex;
-    align-items: center; /* Vertically aligns items in the middle */
-    justify-content: flex-end;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
 }
 
@@ -20,11 +19,20 @@
 }
 
 .action-button {
-    border-radius: 10px;
-    border-width: 1px;
     color: blue;
     background-color:hotpink;
+
+    width: 2em;
+    height: 2em;
+    padding: 0;
+
+    border: 0.1em solid black;
+    border-radius: 50%;
+
+    font-size: 1em;
     font-weight: bolder;
+
+    cursor: pointer;
 }
 
 .action-button:hover {
