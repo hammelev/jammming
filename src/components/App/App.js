@@ -41,21 +41,6 @@ export default function App() {
     }
   }
 
-  const handleAddToPlaylist = (track) => {
-    setPlaylistTracks( prev => {
-      if (prev.find(prevTrack => prevTrack.id === track.id)) {
-        return [prev]
-      }
-      return [...prev, track];
-    });
-  }
-
-  const handleRemoveFromPlaylist = (track) => {
-    setPlaylistTracks( prev => {
-      return prev.filter(prevTrack => prevTrack.id !== track.id);
-    });
-  }
-
   const handleSavePlayList = async () => {
     setIsLoading(true); // Start loading
     try {
@@ -65,6 +50,18 @@ export default function App() {
     } finally {
       setIsLoading(false); // Stop loading
     }
+  }
+
+  const handleAddToPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      return prev.find(prevTrack => prevTrack.id === track.id) ? prev : [...prev, track];
+    });
+  }
+
+  const handleRemoveFromPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      return prev.filter(prevTrack => prevTrack.id !== track.id);
+    });
   }
 
   return (
