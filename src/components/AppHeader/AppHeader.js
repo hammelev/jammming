@@ -18,4 +18,4 @@ export default function AppHeader({isAuthenticated, onLogout}) {
             {isAuthenticated && <button className={`${buttonStyles.secondary} ${styles['logout-button']}`} onClick={onLogout}>Logout</button>}        
         </header>
     );
-}
+}\n
