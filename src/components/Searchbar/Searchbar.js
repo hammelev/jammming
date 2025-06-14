@@ -1,7 +1,6 @@
 // Styles
 import styles from './searchbar.module.css';
-
-// TODO: Pretify search bar
+import buttonStyles from '../../styles/buttons.module.css';
 
 export default function Searchbar({searchQuery, onSetSearchQuery, onHandleSearch}) {
 
@@ -18,11 +17,12 @@ export default function Searchbar({searchQuery, onSetSearchQuery, onHandleSearch
         <form className={styles["search-bar"]} onSubmit={handleSubmit}>
             <input
                 type="text"
+                placeholder='Input to search'
                 onChange={handleSearchChange}
                 value={searchQuery}
                 required
             />
-            <button type="submit">Search</button>
+            <button className={buttonStyles.primary} type="submit">Search</button>
         </form>
     );
 }

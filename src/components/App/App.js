@@ -15,7 +15,7 @@ import styles from './app.module.css';
 import {searchForTrack, createPlaylist} from '../../services/spotifyService';
 
 
-// TODO: Improve styling of the App e.g. header bar with title of the application and bacground.
+// TODO: Separate the header to a separate component with Spotify logo and logout functionality 
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,21 +41,6 @@ export default function App() {
     }
   }
 
-  const handleAddToPlaylist = (track) => {
-    setPlaylistTracks( prev => {
-      if (prev.find(prevTrack => prevTrack.id === track.id)) {
-        return [...prev]
-      }
-      return [...prev, track];
-    });
-  }
-
-  const handleRemoveFromPlaylist = (track) => {
-    setPlaylistTracks( prev => {
-      return prev.filter(prevTrack => prevTrack.id !== track.id);
-    });
-  }
-
   const handleSavePlayList = async () => {
     setIsLoading(true); // Start loading
     try {
@@ -67,6 +52,18 @@ export default function App() {
     }
   }
 
+  const handleAddToPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      return prev.find(prevTrack => prevTrack.id === track.id) ? prev : [...prev, track];
+    });
+  }
+
+  const handleRemoveFromPlaylist = (track) => {
+    setPlaylistTracks( prev => {
+      return prev.filter(prevTrack => prevTrack.id !== track.id);
+    });
+  }
+
   return (
     <div className={styles.app}>
       {isLoading && <LoadingSpinner />} {/* Conditionally render the spinner */}
@@ -76,24 +73,24 @@ export default function App() {
         </p>
       </header>
       {
-        isAuthenticated ?
-        <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} /> :
-        <Login handleIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading}/>
+        !isAuthenticated ?
+        <Login handleIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading}/> :
+        <>
+          <Searchbar searchQuery={searchQuery} onSetSearchQuery={setSearchQuery} onHandleSearch={handleSearch} />
+          <div className={styles["track-container"]}>
+            <SearchResults
+              tracks={searchResultTracks}
+              onAddToPlaylist={handleAddToPlaylist} />
+            <Playlist
+              tracks={playlistTracks}
+              playlistName={playlistName}
+              onSetPlaylistName={setPlaylistName}
+              onSavePlaylist={handleSavePlayList}
+              onRemoveFromPlaylist={handleRemoveFromPlaylist}
+            />
+          </div>
+        </>   
       }
-      
-      <div className={styles["track-container"]}>
-        <SearchResults
-          tracks={searchResultTracks}
-          onAddToPlaylist={handleAddToPlaylist} />
-        <Playlist
-          tracks={playlistTracks}
-          playlistName={playlistName}
-          onSetPlaylistName={setPlaylistName}
-          onSavePlaylist={handleSavePlayList}
-          onRemoveFromPlaylist={handleRemoveFromPlaylist}
-        />
-      </div>
-
     </div>
   );
 }

@@ -1,5 +1,4 @@
-// TODO: Add styling for SearchResults
-// TODO: Add Content to be displayed for a track when it is known what data will be available
+// TODO: Add more information about tracks
 
 export default function Track({track}){
     return (

@@ -1,3 +1,16 @@
-.playlist-container{
-    background-color: rgba(200, 25, 200, 0.3);
+.tracks-heading {
+    text-decoration: underline;
+    text-align: left;
+}
+
+.save-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 1em;
+}
+
+.save-form input {
+    font-size: 1em;
 }
