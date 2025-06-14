@@ -34,7 +34,15 @@
   height: max(4vh, 2vw);
 }
 
-.logout-button {
+.user-area {
+  display: flex;
+  flex-direction: row;
   justify-self: end;
   margin: 0;
+}
+
+.user-text {
+  font-size: 0.8em;
+  margin: 0;
+  padding: 0.5vh 0.5vw;
 }
