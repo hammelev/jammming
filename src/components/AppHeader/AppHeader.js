@@ -14,7 +14,6 @@ export default function AppHeader({isAuthenticated, onLogout}) {
                 <p className={styles["logo-text"]}>Powered by:</p>
                 <img className={styles.logo} src={spotifyLogo} alt="Spotify Logo"/>
             </div>
-            
             {isAuthenticated && <button className={`${buttonStyles.secondary} ${styles['logout-button']}`} onClick={onLogout}>Logout</button>}        
         </header>
     );

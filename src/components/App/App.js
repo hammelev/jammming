@@ -66,12 +66,10 @@ export default function App() {
   }
 
   const handleLogout = () => {
-    setIsLoading(true);
     localStorage.removeItem("access_token");
     localStorage.removeItem("access_token_expires_at");
     localStorage.removeItem("refresh_token");
     setIsAuthenticated(false);
-    setIsLoading(false);
   }
 
 
