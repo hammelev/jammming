@@ -23,7 +23,7 @@ export default function App() {
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
   // TODO: Implement a useEffect to fetch user data when the user is authenticated to not fetch user data on every call where the user ID is needed
 
@@ -87,6 +87,10 @@ export default function App() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("access_token_expires_at");
     localStorage.removeItem("refresh_token");
+    setSearchResultTracks([]);
+    setPlaylistTracks([]);
+    setPlaylistName("");
+    setUser(null);
     setIsAuthenticated(false);
   }
 

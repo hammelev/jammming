@@ -16,6 +16,7 @@ const getUser = async () => {
 		
 	} catch (error) {
 		console.error('Error getting user data:', error);
+		throw error;
 	}
 }
 
@@ -49,6 +50,10 @@ const searchForTrack = async (searchQuery) => {
 const createPlaylist = async (user, playlistName, tracks) => {
 	try {
 		await checkAndRefreshAuthToken();
+
+		if (user === null){
+			throw new Error('User is null');
+		}
 
 		// Create playlist
 		const createPlaylistPayload = {

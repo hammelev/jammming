@@ -6,6 +6,8 @@ import buttonStyles from '../../styles/buttons.module.css';
 // Services
 import {initiateOAuthFlow, handleAuthRedirect} from '../../services/spotifyService';
 
+// TODO: Add more clear styling of errors
+
 export default function Login({handleIsAuthenticated, setIsLoading}) {
       const [authenticationError, setAuthenticationError] = useState(false);
 

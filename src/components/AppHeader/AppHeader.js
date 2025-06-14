@@ -16,7 +16,7 @@ export default function AppHeader({isAuthenticated, onLogout, user}) {
             </div>
             {isAuthenticated &&
             <div className={styles['user-area']}>
-                <p className={styles['user-text']}>Welcome, {user.display_name}!</p>
+                {user?.display_name && <p className={styles['user-text']}>Welcome, {user.display_name}!</p> }
                 <button className={`${buttonStyles.secondary}`} onClick={onLogout}>Logout</button>
             </div>}
         </header>
