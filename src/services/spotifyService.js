@@ -2,7 +2,7 @@ let accessToken = localStorage.getItem('access_token') || null;
 let accessTokenExpiresAt = localStorage.getItem('access_token_expires_at') ? parseInt(localStorage.getItem('access_token_expires_at'), 10) : null;
 let refreshToken = localStorage.getItem('refresh_token') || null;
 
-const getUserInformation = async () => {
+const getUser = async () => {
 	try {
 		await checkAndRefreshAuthToken();
 		const response = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/me`, {
@@ -12,7 +12,6 @@ const getUserInformation = async () => {
 		});
 
 		const data = await response.json();
-
 		return data;
 		
 	} catch (error) {
@@ -47,14 +46,9 @@ const searchForTrack = async (searchQuery) => {
 
 }
 
-const createPlaylist = async (playlistName, tracks) => {
+const createPlaylist = async (user, playlistName, tracks) => {
 	try {
 		await checkAndRefreshAuthToken();
-
-		// Get user info
-		const userInformation = await getUserInformation();
-
-		console.log(`=== ${playlistName} ===`);
 
 		// Create playlist
 		const createPlaylistPayload = {
@@ -70,13 +64,10 @@ const createPlaylist = async (playlistName, tracks) => {
 			}),
 		}
 
-		const createPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/users/${userInformation.id}/playlists`, createPlaylistPayload);
+		const createPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/users/${user.id}/playlists`, createPlaylistPayload);
 
 		if (!createPlayListResponse.ok) {
-			const playlistData = await createPlayListResponse.json();
 			console.error('Error creating playlist:', createPlayListResponse.statusText);
-			console.log(createPlayListResponse);
-			console.log(playlistData);
 			return;
 		}
 
@@ -97,10 +88,6 @@ const createPlaylist = async (playlistName, tracks) => {
 		const addTracksTpPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/playlists/${playlistData.id}/tracks`, addTracksToPlaylistPayload);
 
 		if (!addTracksTpPlayListResponse.ok) {
-			/*const addTracksTo = await createPlayListResponse.json();
-			console.error('Error creating playlist:', createPlayListResponse.statusText);
-			console.log(createPlayListResponse);
-			console.log(playlistData);*/
 			console.error('Error adding tracks to playlist:', addTracksToPlaylistPayload.statusText);
 			return;
 		}
@@ -264,4 +251,4 @@ const sha256 = async (plain) => {
 	return window.crypto.subtle.digest('SHA-256', data)
 }
 
-export { searchForTrack, createPlaylist, handleAuthRedirect, initiateOAuthFlow };
+export { searchForTrack, createPlaylist, handleAuthRedirect, initiateOAuthFlow, getUser };
