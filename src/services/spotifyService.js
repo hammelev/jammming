@@ -73,7 +73,7 @@ const createPlaylist = async (user, playlistName, tracks) => {
 
 		if (!createPlayListResponse.ok) {
 			console.error('Error creating playlist:', createPlayListResponse.statusText);
-			return;
+			throw new Error(`Failed to create playlist: ${createPlayListResponse.statusText}`);
 		}
 
 		const playlistData = await createPlayListResponse.json();
@@ -90,11 +90,11 @@ const createPlaylist = async (user, playlistName, tracks) => {
 			}),
 		}
 
-		const addTracksTpPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/playlists/${playlistData.id}/tracks`, addTracksToPlaylistPayload);
+		const addTracksToPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/playlists/${playlistData.id}/tracks`, addTracksToPlaylistPayload);
 
-		if (!addTracksTpPlayListResponse.ok) {
+		if (!addTracksToPlayListResponse.ok) {
 			console.error('Error adding tracks to playlist:', addTracksToPlaylistPayload.statusText);
-			return;
+			throw new Error(`Error adding tracks to playlist: ${addTracksToPlaylistPayload.statusText}`);
 		}
 
 		console.log('Tracks added to playlist successfully.')
@@ -172,7 +172,6 @@ const handleAuthRedirect = async () => {
 		const response = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
 
 		if (!response.ok) {
-			console.log(response);
 			console.error('Error fetching access token:', response.statusText);
 			return false;
 		}
