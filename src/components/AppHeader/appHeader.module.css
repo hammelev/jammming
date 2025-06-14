@@ -1,0 +1,40 @@
+.app-header {
+  min-height: 10vh;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+
+  font-size: calc(14px + 2vmin);
+
+  border-bottom: solid 2px #ffffff;
+}
+
+.title {
+  justify-self: start;
+  margin: 0;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  margin: 0;
+}
+
+.logo-text {
+  font-size: 0.4em;
+  margin: 0;
+}
+
+.logo {
+  height: max(4vh, 2vw);
+}
+
+.logout-button {
+  justify-self: end;
+  margin: 0;
+}

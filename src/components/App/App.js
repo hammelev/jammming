@@ -1,6 +1,7 @@
 import {useState} from 'react';
 
 // Components
+import AppHeader from '../AppHeader/AppHeader';
 import Playlist from '../Playlist/Playlist';
 import Searchbar from '../Searchbar/Searchbar';
 import SearchResults from '../SearchResults/SearchResults';
@@ -15,8 +16,6 @@ import styles from './app.module.css';
 import {searchForTrack, createPlaylist} from '../../services/spotifyService';
 
 
-// TODO: Separate the header to a separate component with Spotify logo and logout functionality 
-
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResultTracks, setSearchResultTracks] = useState([]);
@@ -25,9 +24,11 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
   const [isLoading, setIsLoading] = useState(false);
 
+  // TODO: Implement a useEffect to fetch user data when the user is authenticated to not fetch user data on every call where the user ID is needed
+
+
   const handleSearch = async () => {
     setIsLoading(true); // Start loading
-
     try {
       const tracks = await searchForTrack(searchQuery);
       if (tracks){
@@ -64,14 +65,18 @@ export default function App() {
     });
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("access_token_expires_at");
+    localStorage.removeItem("refresh_token");
+    setIsAuthenticated(false);
+  }
+
+
   return (
     <div className={styles.app}>
       {isLoading && <LoadingSpinner />} {/* Conditionally render the spinner */}
-      <header className={styles["app-header"]}>
-        <p>
-          Jammming
-        </p>
-      </header>
+      <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout}/>
       {
         !isAuthenticated ?
         <Login handleIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading}/> :
