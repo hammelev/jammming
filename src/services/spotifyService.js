@@ -105,8 +105,6 @@ const createPlaylist = async (user, playlistName, tracks) => {
 }
 
 
-
-
 const checkAndRefreshAuthToken = async () => {
 	if (Date.now() > accessTokenExpiresAt) {
 		await refreshAccessToken();
@@ -198,6 +196,7 @@ const handleAuthRedirect = async () => {
 	}
 }
 
+// FIXME: Handle when refresh token fails e.g. 400 returned from call to refresh
 const refreshAccessToken = async () => {
 
 	const payload = {
