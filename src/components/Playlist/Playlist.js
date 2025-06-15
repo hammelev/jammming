@@ -31,7 +31,11 @@ export default function Playlist({tracks, playlistName, onSetPlaylistName, onSav
                 <button className={buttonStyles.primary} type='submit'>Save to Spotify</button>
             </form>
             {0 < tracks.length && <h3 className={styles['tracks-heading']}>Tracks:</h3>}
-            <TrackList tracks={tracks} action={{handler: onRemoveFromPlaylist, symbol: '-'}}/>
+            <TrackList
+                tracks={tracks}
+                action={{handler: onRemoveFromPlaylist, symbol: '-'}}
+                buttonStyle='secondary'
+            />
         </div>
     );
 }

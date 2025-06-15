@@ -11,6 +11,7 @@ export default function SearchResults({tracks, onAddToPlaylist}){
             <Tracklist
                 tracks={tracks}
                 action={{handler: onAddToPlaylist, symbol: '+'}}
+                buttonStyle='primary'
             />
         </div>
     );
