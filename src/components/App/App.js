@@ -8,9 +8,9 @@ import SearchResults from '../SearchResults/SearchResults';
 import Login from '../Login/Login';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'; // Import the spinner
 
-
 // Styles
 import styles from './app.module.css';
+import sharedStyles from '../../styles/sharedStyles.module.css';
 
 // Services
 import {searchForTrack, createPlaylist, getUser} from '../../services/spotifyService';
@@ -24,50 +24,55 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
-  // TODO: Implement a useEffect to fetch user data when the user is authenticated to not fetch user data on every call where the user ID is needed
-
-  const handleGetUser = async () => {
-    setIsLoading(true); // Start loading
-    try {
-      const newUser = await getUser();
-      setUser(newUser);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false); // Stop loading
-    };
-  }
 
   useEffect(() => {
     if (isAuthenticated) {
+      const handleGetUser = async () => {
+        handleStartRequest();
+        let handleGetUserError = null;
+        try {
+          const newUser = await getUser();
+          setUser(newUser);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          handleGetUserError = error;
+        } finally {
+          handleEndRequest(handleGetUserError);
+        };
+      }
       handleGetUser();
     }
   }, [isAuthenticated]);
 
   const handleSearch = async () => {
-    setIsLoading(true); // Start loading
+    handleStartRequest();
+    let handleSearchError = null;
     try {
       const tracks = await searchForTrack(searchQuery);
       if (tracks){
         setSearchResultTracks(tracks);
       }
       
-    } catch  (error) {
+    } catch (error) {
       console.error("Error searching for tracks:", error);
+      handleSearchError = error;
     } finally {
-      setIsLoading(false); // Stop loading
+      handleEndRequest(handleSearchError);
     }
   }
 
   const handleSavePlayList = async () => {
-    setIsLoading(true); // Start loading
+    handleStartRequest();
+    let handleSavePlayListError = null;
     try {
       await createPlaylist(user, playlistName, playlistTracks);
     } catch (error) {
       console.error("Error saving playlist:", error);
+      handleSavePlayListError = error;
     } finally {
-      setIsLoading(false); // Stop loading
+      handleEndRequest(handleSavePlayListError);
     }
   }
 
@@ -83,6 +88,15 @@ export default function App() {
     });
   }
 
+  const handleStartRequest = () => {
+    setIsLoading(true); // Start loading
+  }
+
+  const handleEndRequest = (error) => {
+    setError(error);
+    setIsLoading(false); // Stop loading
+  }
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("access_token_expires_at");
@@ -94,7 +108,6 @@ export default function App() {
     setIsAuthenticated(false);
   }
 
-
   return (
     <div className={styles.app}>
       {isLoading && <LoadingSpinner />} {/* Conditionally render the spinner */}
@@ -103,6 +116,11 @@ export default function App() {
         onLogout={handleLogout}
         user={user}
       />
+      {error && (
+        <p>
+          <span className={sharedStyles['error-heading']}>Error:</span> <span>{error.message || 'An unexpected error occured. Please try again.'}</span>
+        </p>
+      )}
       {
         !isAuthenticated ?
         <Login handleIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading}/> :
