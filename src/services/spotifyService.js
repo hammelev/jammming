@@ -11,11 +11,14 @@ const getUser = async () => {
 			}
 		});
 
+		if (!response.ok) {
+			throw await handleRequestFailed(response, `Error getting user data`);
+		}
+
 		const data = await response.json();
 		return data;
 		
 	} catch (error) {
-		console.error('Error getting user data:', error);
 		throw error;
 	}
 }
@@ -33,16 +36,15 @@ const searchForTrack = async (searchQuery) => {
 
 		if (!response.ok) {
 			// TODO: Handle token expiry (e.g., 401 Unauthorized) and attempt refresh if possible.
-			console.error('Error searching for track. Status:', response.status, response.statusText);
+			throw await handleRequestFailed(response, `Error searching for track`);
 			// Consider initiating OAuth flow again if token is invalid and cannot be refreshed.
 			// await initiateOAuthFlow();
-			return []; // Return empty array or throw error to be handled by caller
 		}
 		const data = await response.json();
 		return data.tracks.items;
 	} catch (error) {
 		console.error('Network error or JSON parsing error during search:', error);
-		return []; // Return empty array or throw error
+		throw error;
 	}
 
 }
@@ -72,8 +74,7 @@ const createPlaylist = async (user, playlistName, tracks) => {
 		const createPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/users/${user.id}/playlists`, createPlaylistPayload);
 
 		if (!createPlayListResponse.ok) {
-			console.error('Error creating playlist:', createPlayListResponse.statusText);
-			throw new Error(`Failed to create playlist: ${createPlayListResponse.statusText}`);
+			throw await handleRequestFailed(createPlayListResponse, `Error creating playlist`);
 		}
 
 		const playlistData = await createPlayListResponse.json();
@@ -93,17 +94,14 @@ const createPlaylist = async (user, playlistName, tracks) => {
 		const addTracksToPlayListResponse = await fetch(`${process.env.REACT_APP_SPOTIFY_API_BASE_URL}/playlists/${playlistData.id}/tracks`, addTracksToPlaylistPayload);
 
 		if (!addTracksToPlayListResponse.ok) {
-			console.error('Error adding tracks to playlist:', addTracksToPlaylistPayload.statusText);
-			throw new Error(`Error adding tracks to playlist: ${addTracksToPlaylistPayload.statusText}`);
+			throw await handleRequestFailed(addTracksToPlayListResponse, `Error adding tracks to playlist`);
 		}
 
 		console.log('Tracks added to playlist successfully.')
-		
 	} catch (error) {
-		console.error('Error creating playlist:', error);
+		throw error;
 	}
 }
-
 
 const checkAndRefreshAuthToken = async () => {
 	if (Date.now() > accessTokenExpiresAt) {
@@ -134,9 +132,7 @@ const initiateOAuthFlow = async () => {
 		// Redirect to Spotify OAuth page
 		window.location.href = authUrl.toString();
 	} catch (error) {
-		console.error("Error during OAuth initiation:", error);
-		// Potentially display an error message to the user or redirect to an error page
-		// For now, just logging, as redirecting here might be tricky if window.location is the goal
+		throw error;
 	}
 }
 
@@ -170,8 +166,7 @@ const handleAuthRedirect = async () => {
 		const response = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
 
 		if (!response.ok) {
-			console.error('Error fetching access token:', response.statusText);
-			return false;
+			throw await handleRequestFailed(response, `Error fetching access token`);
 		}
 
 		const body = await response.json();
@@ -187,16 +182,12 @@ const handleAuthRedirect = async () => {
 
 		localStorage.removeItem('code_verifier');
 		
-		// For now, let's assume it's successful and would return token data
-		console.log(`Successfully got access token: ${body.access_token}`);
 		return true;
 	} catch (error) {
-		console.error('Error fetching access token:', error);
-		return false;
+		throw error;
 	}
 }
 
-// FIXME: Handle when refresh token fails e.g. 400 returned from call to refresh
 const refreshAccessToken = async () => {
 
 	const payload = {
@@ -212,25 +203,29 @@ const refreshAccessToken = async () => {
     }
 
 	try {
-		const body = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
-		const data = await body.json();
+		const response = await fetch(process.env.REACT_APP_SPOTIFY_TOKEN_URL, payload);
+
+		if (!response.ok) {
+			throw await handleRequestFailed(response, `Error refreshing access token`);
+		}
+
+		const data = await response.json();
 
 		accessToken = data.access_token;
 		accessTokenExpiresAt = Date.now() + (data.expires_in * 1000);
-		if (body.refresh_token) {
-			refreshToken = body.refresh_token;
-			localStorage.setItem('refresh_token', body.refresh_token);
+		if (data.refresh_token) {
+			refreshToken = data.refresh_token;
+			localStorage.setItem('refresh_token', data.refresh_token);
 		}
 
 		localStorage.setItem('access_token', accessToken);
 		localStorage.setItem('access_token_expires_at', accessTokenExpiresAt.toString());
 
 	} catch (error) {
-		console.error('Error refreshing access token:', error);
+		console.error('Error refreshing access token:', error.message);
+		throw error;
 	}
-
 }
-
 
 /*
  * Base64URL maps + -> -, / -> _ and removes padding = as these characters are not safe in URLs
@@ -252,6 +247,34 @@ const sha256 = async (plain) => {
 	const encoder = new TextEncoder()
 	const data = encoder.encode(plain)
 	return window.crypto.subtle.digest('SHA-256', data)
+}
+
+const handleRequestFailed = async (response, defaultErrorMessage) => {
+	let errorInfoMessage = defaultErrorMessage; // Default message for the Error object
+	let consoleLogDetail = 'Could not parse error response body.';
+
+	try {
+		const errorData = await response.json();
+		if (errorData){
+			// Spotify error responses can vary, try to extract the most relevant message
+			if (errorData.error && typeof errorData.error === 'object' && errorData.error.message) {
+                errorInfoMessage = errorData.error.message; // e.g. { error: { status: 401, message: "Invalid access token" } }
+            } else if (errorData.error_description) {
+                errorInfoMessage = errorData.error_description; // e.g. { error: "invalid_grant", error_description: "Invalid refresh token" }
+            } else if (typeof errorData.error === 'string') {
+                errorInfoMessage = errorData.error; // e.g. { error: "some_error_code" }
+            }
+			consoleLogDetail = JSON.stringify(errorData);
+		}
+	} catch (error) {
+		// Failed to parse JSON body, consoleLogDetail remains 'Could not parse error response body.'
+	}
+
+	console.error(`${defaultErrorMessage}. Status: ${response.status} ${response.statusText}. Details: ${consoleLogDetail}`);
+	const err = new Error(errorInfoMessage);
+	err.status = response.status;
+	err.statusText = response.statusText;
+	return err;
 }
 
 export { searchForTrack, createPlaylist, handleAuthRedirect, initiateOAuthFlow, getUser };

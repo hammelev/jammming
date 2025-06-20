@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 
 // Styles
+import styles from './login.module.css';
 import buttonStyles from '../../styles/buttons.module.css';
 
 // Services
@@ -40,7 +41,11 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
             <p>To use the application you need a Spotify account.</p>
             <p>Login to Spotify to start creating playlists.</p>
             <button className={buttonStyles.primary} onClick={handleLogin}>Login to Spotify</button>
-            {authenticationError && <p>Authentication Error - Please try to again!</p>}
+            {authenticationError &&
+                <p>
+                    <span className={styles['error-heading']}>Authentication Error:</span> <span>Please try to again!</span>
+                </p>
+            }
         </div>
     );
 
