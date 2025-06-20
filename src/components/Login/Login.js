@@ -43,7 +43,7 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
             <button className={buttonStyles.primary} onClick={handleLogin}>Login to Spotify</button>
             {authenticationError &&
                 <p>
-                    <span className={sharedStyles['error-heading']}>Authentication Error:</span> <span>Please try to again!</span>
+                    <span className={sharedStyles['error-heading']}>Authentication Error:</span> <span>Please try again!</span>
                 </p>
             }
         </div>
