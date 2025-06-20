@@ -35,11 +35,9 @@ const searchForTrack = async (searchQuery) => {
 		});
 
 		if (!response.ok) {
-			// TODO: Handle token expiry (e.g., 401 Unauthorized) and attempt refresh if possible.
 			throw await handleRequestFailed(response, `Error searching for track`);
-			// Consider initiating OAuth flow again if token is invalid and cannot be refreshed.
-			// await initiateOAuthFlow();
 		}
+		
 		const data = await response.json();
 		return data.tracks.items;
 	} catch (error) {
@@ -272,6 +270,7 @@ const handleRequestFailed = async (response, defaultErrorMessage) => {
 
 	console.error(`${defaultErrorMessage}. Status: ${response.status} ${response.statusText}. Details: ${consoleLogDetail}`);
 	const err = new Error(errorInfoMessage);
+	err.name = 'SpotifyAPIError';
 	err.status = response.status;
 	err.statusText = response.statusText;
 	return err;
