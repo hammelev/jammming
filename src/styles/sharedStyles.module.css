@@ -6,3 +6,8 @@
   margin: 2vh 0;
   padding: 0 1vw;
 }
+
+.error-heading {
+    color: #D32F2F;
+    font-weight: bolder;
+}

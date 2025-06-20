@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 
 // Styles
-import styles from './login.module.css';
+import sharedStyles from '../../styles/sharedStyles.module.css';
 import buttonStyles from '../../styles/buttons.module.css';
 
 // Services
@@ -14,21 +14,21 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
 
     useEffect(() => {
         const handleAuthCallback = async () => {
-        if (window.location.pathname === '/callback') {
-            setIsLoading(true);
-            try {
-                await handleAuthRedirect();
-                handleIsAuthenticated(true);
-            } catch (error) {
-                setAuthenticationError(true);
-                console.error("Error fetching access token:", error);
-            } finally {
-                setIsLoading(false);
+            if (window.location.pathname === '/callback') {
+                setIsLoading(true);
+                try {
+                    await handleAuthRedirect();
+                    handleIsAuthenticated(true);
+                } catch (error) {
+                    setAuthenticationError(true);
+                    console.error("Error fetching access token:", error);
+                } finally {
+                    setIsLoading(false);
+                }
             }
         }
-        }
         handleAuthCallback();
-    }, [])
+    }, [handleIsAuthenticated, setIsLoading])
 
     const handleLogin = async () => {
         setIsLoading(true); // Potentially show loader before redirect
@@ -43,7 +43,7 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
             <button className={buttonStyles.primary} onClick={handleLogin}>Login to Spotify</button>
             {authenticationError &&
                 <p>
-                    <span className={styles['error-heading']}>Authentication Error:</span> <span>Please try to again!</span>
+                    <span className={sharedStyles['error-heading']}>Authentication Error:</span> <span>Please try to again!</span>
                 </p>
             }
         </div>

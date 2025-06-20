@@ -10,6 +10,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'; // Import the spi
 
 // Styles
 import styles from './app.module.css';
+import sharedStyles from '../../styles/sharedStyles.module.css';
 
 // Services
 import {searchForTrack, createPlaylist, getUser} from '../../services/spotifyService';
@@ -25,22 +26,22 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleGetUser = async () => {
-    handleStartRequest();
-    let handleGetUserError = null;
-    try {
-      const newUser = await getUser();
-      setUser(newUser);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      handleGetUserError = error;
-    } finally {
-      handleEndRequest(handleGetUserError);
-    };
-  }
 
   useEffect(() => {
     if (isAuthenticated) {
+      const handleGetUser = async () => {
+        handleStartRequest();
+        let handleGetUserError = null;
+        try {
+          const newUser = await getUser();
+          setUser(newUser);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          handleGetUserError = error;
+        } finally {
+          handleEndRequest(handleGetUserError);
+        };
+      }
       handleGetUser();
     }
   }, [isAuthenticated]);
@@ -117,7 +118,7 @@ export default function App() {
       />
       {error && (
         <p>
-          <span className={styles['error-heading']}>Error:</span> <span>{error.message || 'An unexpected error occured. Please try again.'}</span>
+          <span className={sharedStyles['error-heading']}>Error:</span> <span>{error.message || 'An unexpected error occured. Please try again.'}</span>
         </p>
       )}
       {
