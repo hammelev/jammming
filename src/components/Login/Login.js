@@ -12,7 +12,7 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
 
     useEffect(() => {
         const handleAuthCallback = async () => {
-            if (window.location.pathname === '/callback') {
+            if (window.location.pathname === '/jammming/callback') {
                 setIsLoading(true);
                 try {
                     await handleAuthRedirect();
