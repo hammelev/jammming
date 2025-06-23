@@ -34,7 +34,7 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
             await initiateOAuthFlow();
         } catch (error) {
             setAuthenticationError(true);
-            console.error("Error fetching access token:", error);
+            console.error("Error initiating OAuth flow:", error);
         }
         
     }
