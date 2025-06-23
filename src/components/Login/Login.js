@@ -29,9 +29,14 @@ export default function Login({handleIsAuthenticated, setIsLoading}) {
     }, [handleIsAuthenticated, setIsLoading])
 
     const handleLogin = async () => {
-        setIsLoading(true); // Potentially show loader before redirect
         setAuthenticationError(false);
-        await initiateOAuthFlow();
+        try {
+            await initiateOAuthFlow();
+        } catch (error) {
+            setAuthenticationError(true);
+            console.error("Error initiating OAuth flow:", error);
+        }
+        
     }
 
     return (

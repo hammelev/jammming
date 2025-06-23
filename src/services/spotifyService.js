@@ -176,7 +176,7 @@ const handleAuthRedirect = async () => {
 		localStorage.setItem('access_token', body.access_token);
 		localStorage.setItem('access_token_expires_at', accessTokenExpiresAt.toString());
 		localStorage.setItem('refresh_token', body.refresh_token); // Only store if present
-		window.history.replaceState({}, document.title, "/");
+		window.history.replaceState({}, document.title, process.env.PUBLIC_URL || "/");
 
 		localStorage.removeItem('code_verifier');
 		
